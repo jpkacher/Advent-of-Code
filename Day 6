@@ -1,0 +1,53 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Dec  6 12:12:26 2019
+
+@author: jkacher and rpimentel
+"""
+def intersection(lst1,lst2):
+    lst3 = [value for value in lst1 if value in lst2]
+    return lst3
+
+with open('C:\Users\jkacher\.spyder\Orbits.txt') as f:
+    lines = f.read().splitlines()
+    
+orbitlist = []
+
+for l in lines:
+    pair=l.split(')')
+    pair.reverse()
+    orbitlist.append(tuple(pair))
+
+orbitdict = dict(orbitlist)
+
+#%%
+# part 1
+count = 0
+for planet in orbitdict:
+    count += 1
+    while orbitdict[planet] != 'COM':
+        planet = orbitdict[planet]
+        count += 1
+print(count)
+#%%
+# part 2
+pathYOU = []
+planet = orbitdict['YOU']
+pathYOU.append(planet)
+while orbitdict[planet] != 'COM':
+    planet = orbitdict[planet]
+    pathYOU.append(planet)
+    
+planet = orbitdict['SAN']
+pathSAN = []
+pathSAN.append(planet)
+while orbitdict[planet] != 'COM':
+    planet = orbitdict[planet]
+    pathSAN.append(planet)
+    
+inter = intersection(pathYOU,pathSAN)
+print(len(pathYOU)+len(pathSAN)-2*len(inter))
+        
+
+
+
