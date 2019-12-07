@@ -1,0 +1,35 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec  4 12:44:56 2019
+
+@author: jkacher
+"""
+import numpy as np
+
+count = 0
+dig = np.zeros(8)
+for x in range (124075,580770):
+    currnum = str(x)
+    dig[0] = float(currnum[0])
+    dig[1] = float(currnum[1])
+    dig[2] = float(currnum[2])
+    dig[3] = float(currnum[3])
+    dig[4] = float(currnum[4])
+    dig[5] = float(currnum[5])
+    if dig[0] == dig[1] or dig[1] == dig[2] or dig[2] == dig[3] or dig[3] == dig[4] or dig[4] == dig[5]:
+        if dig[0] <= dig[1] and dig[1] <= dig[2] and dig[2] <= dig[3] and dig[3] <= dig[4] and dig[4] <= dig[5]:
+            numset = np.zeros(10)
+            for j in range(0,10):
+                inst = np.zeros(6)
+                for y in range(0,6):
+                    incount = y
+                    while dig[incount-1] == dig[incount] and incount < 7 and dig[incount-1] == j:
+                        incount = incount+1
+                        inst[y-1] = incount-y+1
+                if np.max(inst) == 2:
+                    numset[j] = 1
+            if np.sum(numset) > 0:
+                count = count+1
+
+print(count)
+#2101 is too high, 997 is too low, 1482 is too high, 1316 is incorrect, 1066 is incorrect
