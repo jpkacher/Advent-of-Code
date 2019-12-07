@@ -1,0 +1,137 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+#%%
+import pandas as pd
+import numpy as np
+
+def ccw(A,B,C):
+    return (C[1]-A[1]) * (B[0]-A[0]) > (B[1]-A[1]) * (C[0]-A[0])
+
+# Return true if line segments AB and CD intersect
+def intersect(A,B,C,D):
+    return ccw(A,C,D) != ccw(B,C,D) and ccw(A,B,C) != ccw(A,B,D)
+#%%
+
+P1 = pd.read_csv('C:\Users\jkacher\Desktop\Matlab stuff\Coding advent\P1.csv')
+P2 = pd.read_csv('C:\Users\jkacher\Desktop\Matlab stuff\Coding advent\P2.csv')
+
+P1_len = len(P1.columns)
+P2_len = len(P2.columns)
+#%%
+# define all line segments for P1
+P1_segs = np.zeros((P1_len,4))
+P1_pts = np.zeros((P1_len+1,2))
+startx = 0
+starty = 0
+for x in range(0,P1_len):
+    step = P1.columns[x]
+    direction = step[0]
+    distance = np.round(float(step[1:]))
+    if direction == 'U':
+        newx = startx + distance
+        newy = starty
+    elif direction == 'D':
+        newx = startx - distance
+        newy = starty
+    elif direction == 'L':
+        newx = startx
+        newy = starty-distance
+    elif direction == 'R':
+        newx = startx
+        newy = starty + distance
+    P1_segs[x,:] = [startx,starty,newx,newy]
+    P1_pts[x+1,:] = [newx,newy]
+    startx = newx
+    starty = newy
+#%%
+# define all line segments for P2
+P2_segs = np.zeros((P2_len,4))
+P2_pts = np.zeros((P2_len+1,2))
+startx = 0
+starty = 0
+for x in range(0,P2_len):
+    step = P2.columns[x]
+    direction = step[0]
+    distance = np.round(float(step[1:]))
+    if direction == 'U':
+        newx = startx + distance
+        newy = starty
+    elif direction == 'D':
+        newx = startx - distance
+        newy = starty
+    elif direction == 'L':
+        newx = startx
+        newy = starty-distance
+    elif direction == 'R':
+        newx = startx
+        newy = starty + distance
+    P2_segs[x,:] = [startx,starty,newx,newy]
+    P2_pts[x+1,:] = [newx,newy]
+    startx = newx
+    starty = newy
+#%%
+# check if any segments cross
+crossings = np.zeros((99,2))
+crossxy = np.zeros((99,2))
+counter = 0
+for x in range (0,P1_len):
+    P1_seg = P1_segs[x,:]
+    P1s = P1_seg[0:2]
+    P1e = P1_seg[2:4]
+    for y in range (0,P2_len):
+        P2_seg = P2_segs[y,:]
+        P2s = P2_seg[0:2]
+        P2e = P2_seg[2:4]
+        if intersect(P1s,P1e,P2s,P2e) == 1:
+            # get intersect scaler
+            ta = ((P2s[1]-P2e[1])*(P1s[0]-P2s[0])+(P2e[0]-P2s[0])*(P1s[1]-P2s[1]))/((P2e[0]-P2s[0])*(P1s[1]-P1e[1])-(P1s[0]-P1e[0])*(P2e[1]-P2s[1]))
+            crossings[counter,0] = P1s[0]+ta*(P1e[0]-P1s[0])
+            crossings[counter,1] = P1s[1]+ta*(P1e[1]-P1s[1])
+            crossxy[counter] = [x,y]
+            counter = counter+1
+#%%
+# Calculate the number of steps associated with each crossing
+crossteps = np.zeros(99)
+minner = 999999999999
+for x in range (0,len(crossings)):
+    for j in range (0,int(crossxy[x,0])):
+        crossteps[x] = crossteps[x]+np.sum(np.abs(P1_pts[j,:]-P1_pts[j+1,:]))
+    for j in range (0,int(crossxy[x,1])):
+        crossteps[x] = crossteps[x]+np.sum(np.abs(P2_pts[j,:]-P2_pts[j+1,:]))
+#    crossteps[x] = np.sum(np.sum(np.abs(P1_pts[0:int(crossxy[x,0])+1,:])))+np.sum(np.sum(np.abs(P2_pts[0:int(crossxy[x,1])+1,:])))
+    crossteps[x] = crossteps[x]+np.sum(np.abs(crossings[x,:]-P1_pts[int(crossxy[x,0]),:]))+np.sum(np.abs(crossings[x,:]-P2_pts[int(crossxy[x,1]),:]))
+for x in range (0,len(crossings)):
+    if 0<crossteps[x]<minner:
+        minner = crossteps[x]
+print(minner)
+# should be 15+15 for small
+#%%
+# calculate Manhattan distance for each point
+MinManDist = 999999
+for x in range(0,len(crossings)):
+    ManDist = np.abs(crossings[x,0])+np.abs(crossings[x,1])
+    if 0 < ManDist < MinManDist:
+        MinManDist = ManDist
+
+print(MinManDist)
+            
+        
+        
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
